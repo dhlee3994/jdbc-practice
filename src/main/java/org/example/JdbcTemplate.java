@@ -16,19 +16,18 @@ public class JdbcTemplate {
         }
     }
 
-    public Object executeQuery(String sql, PreparedStatementSetter pss, RowMapper rowMapper) throws SQLException {
+    public <T> T executeQuery(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) throws SQLException {
         final Connection conn = ConnectionManager.getConnection();
         final PreparedStatement ps = conn.prepareStatement(sql);
         pss.setter(ps);
         final ResultSet rs = ps.executeQuery();
 
         try (conn; ps; rs) {
-            Object obj = null;
+            T t = null;
             if (rs.next()) {
-                obj = rowMapper.map(rs);
+                t = rowMapper.map(rs);
             }
-
-            return obj;
+            return t;
         }
     }
 }
